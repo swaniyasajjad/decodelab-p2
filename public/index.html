@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Task Manager</title>
+<style>
+  :root {
+    --sage: #7c9070;
+    --sage-dark: #5e7053;
+    --cream: #f4f1e8;
+    --ink: #2e3a28;
+    --muted: #6b7563;
+    --danger: #b3503f;
+    --border: #d9d4c4;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--sage);
+    color: var(--white);
+    padding: 1.5rem 2rem;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  header p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .panel h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    color: var(--sage-dark);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    outline: 2px solid var(--sage);
+    outline-offset: 1px;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    padding: 0.55rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: var(--sage);
+    color: white;
+    align-self: flex-start;
+  }
+  .btn-primary:hover { background: var(--sage-dark); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.78rem;
+  }
+  .btn-danger:hover { background: var(--danger); color: white; }
+
+  .btn-toggle {
+    background: transparent;
+    color: var(--sage-dark);
+    border: 1px solid var(--sage);
+    padding: 0.3rem 0.6rem;
+    font-size: 0.78rem;
+  }
+  .btn-toggle:hover { background: var(--sage); color: white; }
+
+  #status-banner {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  #status-banner.show { display: block; }
+  #status-banner.success { background: #e7efe2; color: var(--sage-dark); border: 1px solid var(--sage); }
+  #status-banner.error { background: #f5e6e2; color: var(--danger); border: 1px solid var(--danger); }
+
+  .task-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .task-item.completed { background: #f7f9f4; }
+
+  .task-text { flex: 1; }
+
+  .task-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .task-item.completed .task-title {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .task-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  .task-id {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+    padding: 1.5rem 0;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .filter-row button {
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem;
+  }
+  .filter-row button.active {
+    background: var(--sage);
+    color: white;
+    border-color: var(--sage);
+  }
+
+  .endpoint-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+
+  code {
+    background: #eee8d8;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Task Manager</h1>
+  <p>Organize, track, and manage your tasks efficiently.</p>
+</header>
+
+<main>
+  <div id="status-banner"></div>
+<section class="panel">
+  <h2>Create Task</h2>
+  <form id="task-form">
+    <label for="title">Title</label>
+    <input
+      type="text"
+      id="title"
+      name="title"
+      placeholder="Enter task title"
+    />
+
+    <label for="description">Description</label>
+    <textarea
+      id="description"
+      name="description"
+      rows="2"
+      placeholder="Enter task details"
+    ></textarea>
+
+    <button type="submit" class="btn-primary">
+      Add Task
+    </button>
+  </form>
+
+  <p class="endpoint-note">
+    Create and manage your daily tasks.
+  </p>
+</section>
+
+  <section class="panel">
+    <h2>Tasks</h2>
+    <div class="filter-row">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="true">Completed</button>
+      <button data-filter="false">Pending</button>
+      <button id="refresh-btn" style="margin-left:auto;">Refresh</button>
+    </div>
+    <div id="task-list" class="task-list">
+      taskListEl.innerHTML = '<div class="empty-state">No tasks available. Add your first task.</div>';
+    </div>
+  </section>
+</main>
+
+<script>
+  const API_BASE = window.location.origin; // assumes frontend is served by the same Express server
+  const taskListEl = document.getElementById('task-list');
+  const formEl = document.getElementById('task-form');
+  const bannerEl = document.getElementById('status-banner');
+  const filterButtons = document.querySelectorAll('.filter-row button[data-filter]');
+  let currentFilter = 'all';
+
+  function showBanner(message, type) {
+    bannerEl.textContent = message;
+    bannerEl.className = `show ${type}`;
+    setTimeout(() => { bannerEl.className = ''; }, 4000);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  async function fetchTasks() {
+   taskListEl.innerHTML = '<div class="empty-state">Loading...</div>';
+    try {
+      const query = currentFilter === 'all' ? '' : `?completed=${currentFilter}`;
+      const res = await fetch(`${API_BASE}/tasks${query}`);
+      const result = await res.json();
+
+      if (!result.success || result.data.length === 0) {
+        taskListEl.innerHTML = '<div class="empty-state">No tasks here. Create one above.</div>';
+        return;
+      }
+
+      taskListEl.innerHTML = result.data.map(renderTask).join('');
+      attachTaskListeners();
+    } catch (err) {
+      taskListEl.innerHTML = '<div class="empty-state">Unable to load tasks.</div>';
+    }
+  }
+
+  function renderTask(task) {
+    return `
+      <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+        <div class="task-text">
+          <div class="task-title">${escapeHtml(task.title)}</div>
+          ${task.description ? `<div class="task-desc">${escapeHtml(task.description)}</div>` : ''}
+          <div class="task-id">ID: ${task.id}</div>
+        </div>
+        <div class="task-actions">
+          <button class="btn-toggle" data-action="toggle" data-id="${task.id}">
+            ${task.completed ? 'Mark pending' : 'Mark done'}
+          </button>
+          <button class="btn-danger" data-action="delete" data-id="${task.id}">Delete</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function attachTaskListeners() {
+    taskListEl.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+      btn.addEventListener('click', () => toggleTask(btn.dataset.id));
+    });
+    taskListEl.querySelectorAll('[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', () => deleteTask(btn.dataset.id));
+    });
+  }
+
+  async function toggleTask(id) {
+    try {
+      const res = await fetch(`${API_BASE}/tasks/${id}/complete`, { method: 'PATCH' });
+      const result = await res.json();
+      if (res.ok) {
+        showBanner(result.message, 'success');
+        fetchTasks();
+      } else 
+      {
+        showBanner('Failed to update task.', 'error'); showBanner(result.message || 'Could not update task.', 'error');
+      }
+    } catch (err) {
+      showBanner('Network error while updating task.', 'error');
+    }
+  }
+
+  async function deleteTask(id) {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/tasks/${id}`, { method: 'DELETE' });
+      if (res.status === 204) {
+       showBanner('Task deleted successfully.', 'success');
+        fetchTasks();
+      } else {
+        const result = await res.json();
+        showBanner('Failed to delete task.', 'error');
+      }
+    } catch (err) {
+      showBanner('Network error while deleting task.', 'error');
+    }
+  }
+
+  formEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+
+    try {
+      const res = await fetch(`${API_BASE}/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description })
+      });
+      const result = await res.json();
+
+      if (res.status === 201) {
+        showBanner('Task created successfully.', 'success');
+        formEl.reset();
+        fetchTasks();
+      } else {
+        // Show validation errors returned by the backend, e.g. missing title
+        const msg = (result.errors && result.errors.join(' ')) || result.message || 'Could not create task.';
+        showBanner(msg, 'error');
+      }
+    } catch (err) {
+      showBanner('Failed to create task.', 'error');
+    }
+  });
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      fetchTasks();
+    });
+  });
+
+  document.getElementById('refresh-btn').addEventListener('click', fetchTasks);
+
+  fetchTasks();
+</script>
+
+</body>
+</html>

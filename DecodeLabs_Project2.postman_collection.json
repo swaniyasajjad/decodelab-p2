@@ -1,0 +1,109 @@
+{
+  "info": {
+    "name": "DecodeLabs Project 2 - Task API",
+    "description": "Test collection for the Backend API Development project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "GET all tasks",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks"
+      }
+    },
+    {
+      "name": "GET completed tasks only",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks?completed=true"
+      }
+    },
+    {
+      "name": "GET single task (valid id)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks/1"
+      }
+    },
+    {
+      "name": "GET single task (not found -> 404)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tasks/999"
+      }
+    },
+    {
+      "name": "POST create task (valid -> 201)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test the API\",\n  \"description\": \"Make sure it works end to end\"\n}"
+        },
+        "url": "{{baseUrl}}/tasks"
+      }
+    },
+    {
+      "name": "POST create task (invalid - missing title -> 400)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"This has no title field\"\n}"
+        },
+        "url": "{{baseUrl}}/tasks"
+      }
+    },
+    {
+      "name": "PUT update task (valid -> 200)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated title\",\n  \"completed\": true\n}"
+        },
+        "url": "{{baseUrl}}/tasks/1"
+      }
+    },
+    {
+      "name": "PUT update task (not found -> 404)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Does not matter\"\n}"
+        },
+        "url": "{{baseUrl}}/tasks/999"
+      }
+    },
+    {
+      "name": "DELETE task (valid -> 204)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/tasks/2"
+      }
+    },
+    {
+      "name": "DELETE task (not found -> 404)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/tasks/999"
+      }
+    },
+    {
+      "name": "GET unknown route (-> 404)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/banana"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "decodelabs-task-api",
+  "version": "1.0.0",
+  "description": "Project 2: Backend API Development - DecodeLabs Industrial Training Kit",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["api", "rest", "express", "backend"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
