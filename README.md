@@ -190,4 +190,3 @@ Or import `DecodeLabs_Project2.postman_collection.json` (included) directly into
 - Write automated tests (Jest + Supertest)
 
 ---
-*DecodeLabs — www.decodelabs.tech*
